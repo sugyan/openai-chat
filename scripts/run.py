@@ -7,7 +7,11 @@ from ai.chat import ChatRunner
 def main(debug: bool) -> None:
     system_message = input("System: ")
 
-    chat = ChatRunner(debug).start_conversation(system_message=system_message)
+    chat = ChatRunner(debug).start_conversation(
+        system_message=system_message,
+        temperature=1.5,
+        # max_tokens=100,
+    )
     while True:
         response = chat(input("User: "))
         print("Assistant: ", end="")

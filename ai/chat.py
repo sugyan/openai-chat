@@ -7,7 +7,14 @@ from .config import settings
 
 
 class Conversation:
-    def __init__(self, system_message: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        system_message: Optional[str] = None,
+        temperature: float = 1.0,
+        max_tokens: Optional[int] = None,
+    ) -> None:
+        self.temperature = temperature
+        self.max_tokens = max_tokens
         self.messages = []
         if system_message is not None:
             self.messages.append({"role": "system", "content": system_message})
@@ -17,6 +24,8 @@ class Conversation:
         response = ChatCompletion.create(
             api_key=settings.openai_api_key,
             model="gpt-3.5-turbo",
+            temperature=self.temperature,
+            max_tokens=self.max_tokens,
             messages=self.messages,
             stream=True,
         )  # type: ignore
@@ -34,9 +43,16 @@ class ChatRunner:
             self.logger.setLevel(logging.INFO)
 
     def start_conversation(
-        self, system_message: Optional[str] = None
+        self,
+        system_message: Optional[str] = None,
+        temperature: float = 1.0,
+        max_tokens: Optional[int] = None,
     ) -> Callable[[str], Generator[str, None, None]]:
-        conversation = Conversation(system_message=system_message)
+        conversation = Conversation(
+            system_message=system_message,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
 
         def chat(user_message: str) -> Generator[str, None, None]:
             response = ""
